@@ -2,3 +2,7 @@
 [2026-11-17 01:31:02]   túnel serveo abierto; Meta descarga el video…
 [2026-11-17 01:31:31]   respuesta de subida: {'success': True, 'message': 'Upload Successful.'}
 [2026-11-17 01:31:32]   PRUEBA estado final: FINISHED - Finished: Media has been uploaded and it is ready to be published.
+[2026-11-17 02:19:42] PRUEBA (no publica): contenedor 17967500772027444, video 208_segundos_vuelo1549_parte2_ig.mp4
+[2026-11-17 02:19:44]   túnel serveo abierto; Meta descarga el video…
+[2026-11-17 02:20:14]   respuesta de subida: {'success': True, 'message': 'Upload Successful.'}
+[2026-11-17 02:20:14]   PRUEBA estado final: FINISHED - Finished: Media has been uploaded and it is ready to be published.
