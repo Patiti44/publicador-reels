@@ -60,15 +60,14 @@ jobs:
         env:
           VIDEOS_DEPLOY_KEY: ${{ secrets.VIDEOS_DEPLOY_KEY }}
         run: |
-          printf '%s
-' "$VIDEOS_DEPLOY_KEY" > "$RUNNER_TEMP/videos_key" && chmod 600 "$RUNNER_TEMP/videos_key"
+          echo "$VIDEOS_DEPLOY_KEY" > "$RUNNER_TEMP/videos_key" && chmod 600 "$RUNNER_TEMP/videos_key"
           echo "VIDEOS_DEPLOY_KEY_FILE=$RUNNER_TEMP/videos_key" >> "$GITHUB_ENV"
 
       - name: Publicar lo que toca
         run: |
           case "${{ inputs.accion }}" in
             simular) python publicar_reel.py ejecutar --simular ;;
-            probar-subida) V="${{ inputs.video }}"; [ -z "$V" ] && V=$(ls videos/*_ig.mp4 | head -1); python publicar_reel.py probar-subida "$V" ;;
+            probar-subida) V="${{ inputs.video }}"; [ -z "$V" ] && V=$(ls videos/*.mp4 | head -1); python publicar_reel.py probar-subida "$V" ;;
             *) python publicar_reel.py ejecutar ;;
           esac
 
