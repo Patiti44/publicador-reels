@@ -15,3 +15,6 @@
 [2026-11-17 16:13:46] Comentando #2 https://www.instagram.com/reel/Df2p7PlisVu/
 [2026-11-17 16:13:48]   comentario 18181195768452452: 🅰️ Equipo A: me quedo en Hiroshima. Dale ❤️ si tú también eliges la A
 [2026-11-17 16:13:53]   comentario 18073875608788246: 🅱️ Equipo B: subo al tren a Nagasaki. Dale ❤️ si tú también eliges la B
+[2026-11-17 16:29:51] PRUEBA (no publica): contenedor 17967678534027444, video prueba_hd_ig.mp4
+[2026-11-17 16:29:53]   túnel serveo abierto; Meta descarga el video…
+[2026-11-17 16:30:05] ERROR: HTTP 500: {"debug_info":{"retriable":false,"type":"InternalServerError","message":"proxygen::coro::HTTPError: HTTP source aborted err=INTERNAL_ERROR, details=received RST_STREAM from peer"}}
