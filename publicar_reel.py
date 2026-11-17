@@ -32,7 +32,8 @@ FMT = '%Y-%m-%d %H:%M'
 # ---------------- utilidades ----------------
 def log(msg):
     linea = f"[{dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] {msg}"
-    print(linea, flush=True)
+    try: print(linea, flush=True)
+    except UnicodeEncodeError: print(linea.encode('ascii', 'replace').decode(), flush=True)  # consola de Windows sin UTF-8
     with open(REGISTRO, 'a', encoding='utf-8') as f: f.write(linea + '\n')
 
 
@@ -256,6 +257,32 @@ def publicar(api, uid, item):
     log(f"  PUBLICADO #{item['id']} {item.get('permalink', '')}")
 
 
+def comentar(api, item):
+    """Deja los comentarios de item['comentarios'] en el reel publicado (p. ej. los de la opción A y B).
+    Fijarlos no se puede por la API: se fijan a mano desde la app de Instagram."""
+    hechos = item.setdefault('comentarios_ids', [])
+    for txt in item.get('comentarios', [])[len(hechos):]:
+        if api.sim: log(f'  [SIMULACIÓN] comentaría: {txt}'); continue
+        r = api.post(f"{item['media_id']}/comments", {'message': txt})
+        hechos.append(r['id']); log(f"  comentario {r['id']}: {txt}")
+        time.sleep(3)
+
+
+def comentarios_pendientes(cola):
+    return [x for x in cola if x['estado'] == 'publicado' and x.get('media_id') and len(x.get('comentarios_ids', [])) < len(x.get('comentarios', [])) and x.get('comentar_intentos', 0) < 5]
+
+
+def cmd_comentar(a):
+    c = cargar_config(); api = API(c, a.simular); cola = leer(COLA, [])
+    for item in comentarios_pendientes(cola):
+        log(f"Comentando #{item['id']} {item.get('permalink', '')}")
+        try: comentar(api, item); item.pop('error_comentario', None)
+        except ErrorAPI as e:
+            item['comentar_intentos'] = item.get('comentar_intentos', 0) + 1; item['error_comentario'] = str(e)
+            log(f"  ERROR al comentar #{item['id']}: {e}")
+        if not a.simular: guardar(COLA, cola)
+
+
 def cmd_probar_subida(a):
     """Crea un contenedor y hace que Meta reciba el video, pero NO publica (el contenedor caduca solo en 24 h)."""
     c = cargar_config(); api = API(c); uid = user_id(api)
@@ -280,7 +307,10 @@ def cmd_ejecutar(a):
         except ErrorAPI as e: log(f'No se pudo renovar el token: {e}')
     cola = leer(COLA, []); ahora = dt.datetime.now()
     tocan = [x for x in cola if x['estado'] in ('pendiente', 'subiendo', 'error') and dt.datetime.strptime(x['publicar_en'], FMT) <= ahora and x.get('intentos', 0) < 5]
-    if not tocan: log('Nada que publicar.' + (' (simulación)' if a.simular else '')); return
+    if not tocan:
+        if comentarios_pendientes(cola): cmd_comentar(a)
+        else: log('Nada que publicar.' + (' (simulación)' if a.simular else ''))
+        return
     uid = 'SIMULADO' if a.simular and not c.get('ig_user_id') else user_id(api)
     for item in sorted(tocan, key=lambda x: x['publicar_en'])[:a.max]:
         log(f"Publicando #{item['id']} ({Path(item['video']).name}) programado para {item['publicar_en']}" + (' [SIMULACIÓN]' if a.simular else ''))
@@ -292,6 +322,7 @@ def cmd_ejecutar(a):
             if item['estado'] != 'subiendo' or 'contenedor' not in item: item['estado'] = 'error'
             log(f"  ERROR #{item['id']} (intento {item['intentos']}/5): {e}")
         guardar(COLA, cola)
+    if not a.simular and comentarios_pendientes(cola): cmd_comentar(a)
 
 
 def main():
@@ -301,9 +332,10 @@ def main():
     g = sp.add_parser('agregar'); g.add_argument('video'); g.add_argument('fecha', help='"AAAA-MM-DD HH:MM" hora local')
     g.add_argument('--texto'); g.add_argument('--texto-archivo'); g.add_argument('--portada-ms', type=int, default=None, help='ms del video para la portada')
     pr = sp.add_parser('probar-subida'); pr.add_argument('video')
+    cm = sp.add_parser('comentar'); cm.add_argument('--simular', action='store_true')
     e = sp.add_parser('ejecutar'); e.add_argument('--simular', action='store_true'); e.add_argument('--max', type=int, default=1, help='máximo de reels por ejecución')
     a = ap.parse_args()
-    try: {'verificar': cmd_verificar, 'renovar': cmd_renovar, 'agregar': cmd_agregar, 'cola': cmd_cola, 'ejecutar': cmd_ejecutar, 'probar-subida': cmd_probar_subida}[a.cmd](a)
+    try: {'verificar': cmd_verificar, 'renovar': cmd_renovar, 'agregar': cmd_agregar, 'cola': cmd_cola, 'ejecutar': cmd_ejecutar, 'probar-subida': cmd_probar_subida, 'comentar': cmd_comentar}[a.cmd](a)
     except ErrorAPI as e: log(f'ERROR: {e}'); sys.exit(1)
 
 
