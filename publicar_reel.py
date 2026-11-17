@@ -275,7 +275,10 @@ def publicar(api, uid, item):
             rc = api.post(f'{uid}/media', p); cont = rc['id']
             log(f"  contenedor {cont} (envío {intento}/3, modo {modo})")
             try:
-                r = subir_video(api, cont, rc.get('uri'), fuente) if (modo in ('tunel', 'pages') and not api.sim) else api.subir(cont, fuente, rc.get('uri'))
+                if api.sim: r = api.subir(cont, fuente, rc.get('uri'))
+                elif intento == 3 and modo == 'pages': r = subir_por_tunel(api, cont, rc.get('uri'), fuente)  # último envío: túnel directo al runner (probado)
+                elif modo in ('tunel', 'pages'): r = subir_video(api, cont, rc.get('uri'), fuente)
+                else: r = api.subir(cont, fuente, rc.get('uri'))
                 if not r.get('success', True): raise ErrorAPI(f'la subida falló: {r}')
                 break
             except (ErrorAPI, RuntimeError) as e:
