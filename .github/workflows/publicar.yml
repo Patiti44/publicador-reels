@@ -3,11 +3,12 @@ name: Publicar reels
 # Publica en Instagram los reels de cola.json cuya hora (America/Santiago) ya llegó.
 # Corre en GitHub, así que el PC puede estar apagado.
 # - cada hora al minuto 3
-# - cada 10 minutos entre las 19:00 y las 20:59 UTC (16:00-17:59 en Chile en verano, 15:00-16:59 en invierno)
+# - cada 10 minutos 19:00-20:59 y 23:00-00:59 UTC (16-18 h y 20-22 h en Chile en verano)
 on:
   schedule:
     - cron: '3 * * * *'
-    - cron: '*/10 19,20 * * *'
+    - cron: '*/10 19,20,23 * * *'
+    - cron: '*/10 0 * * *'
   workflow_dispatch:
     inputs:
       accion:
