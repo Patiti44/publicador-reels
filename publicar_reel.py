@@ -210,7 +210,7 @@ def version_hd(video: Path) -> Path:
     if destino.exists() and destino.stat().st_mtime >= video.stat().st_mtime: return destino
     import subprocess
     cmd = ['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow',
-           '-crf', '19', '-maxrate', '6000k', '-bufsize', '12000k', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '160k', '-ar', '48000',
+           '-crf', '19', '-maxrate', '6000k', '-bufsize', '12000k', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '128k', '-ar', '48000',
            '-movflags', '+faststart', str(destino)]
     r = subprocess.run(cmd, capture_output=True, text=True, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
     if r.returncode != 0: raise ErrorAPI(f'ffmpeg no pudo preparar el video: {r.stderr[-300:]}')
