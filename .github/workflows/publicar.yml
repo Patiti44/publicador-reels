@@ -10,10 +10,11 @@ on:
     - cron: '*/10 19,20 * * *'
   workflow_dispatch:
     inputs:
-      simular:
-        description: 'Solo simular (no publica)'
-        type: boolean
-        default: false
+      accion:
+        description: 'Qué hacer'
+        type: choice
+        options: [ejecutar, simular, probar-subida]
+        default: ejecutar
 
 permissions:
   contents: write
@@ -52,7 +53,11 @@ jobs:
 
       - name: Publicar lo que toca
         run: |
-          if [ "${{ inputs.simular }}" = "true" ]; then python publicar_reel.py ejecutar --simular; else python publicar_reel.py ejecutar; fi
+          case "${{ inputs.accion }}" in
+            simular) python publicar_reel.py ejecutar --simular ;;
+            probar-subida) python publicar_reel.py probar-subida "$(ls videos/*_ig.mp4 | head -1)" ;;
+            *) python publicar_reel.py ejecutar ;;
+          esac
 
       - name: Guardar el estado de la cola
         if: always()

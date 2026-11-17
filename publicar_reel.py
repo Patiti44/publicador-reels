@@ -256,6 +256,22 @@ def publicar(api, uid, item):
     log(f"  PUBLICADO #{item['id']} {item.get('permalink', '')}")
 
 
+def cmd_probar_subida(a):
+    """Crea un contenedor y hace que Meta reciba el video, pero NO publica (el contenedor caduca solo en 24 h)."""
+    c = cargar_config(); api = API(c); uid = user_id(api)
+    video = version_instagram(Path(a.video).resolve())
+    rc = api.post(f'{uid}/media', {'media_type': 'REELS', 'upload_type': 'resumable'}); cont = rc['id']
+    log(f'PRUEBA (no publica): contenedor {cont}, video {video.name}')
+    r = subir_por_tunel(api, cont, rc.get('uri'), video) if c.get('subida', 'tunel') == 'tunel' else api.subir(cont, video, rc.get('uri'))
+    log(f'  respuesta de subida: {r}')
+    for _ in range(30):
+        st = api.get(cont, {'fields': 'status_code,status'})
+        if st.get('status_code') in ('FINISHED', 'ERROR', 'EXPIRED'): break
+        time.sleep(10)
+    log(f"  PRUEBA estado final: {st.get('status_code')} - {st.get('status')}")
+    if st.get('status_code') != 'FINISHED': sys.exit(1)
+
+
 def cmd_ejecutar(a):
     c = cargar_config(); api = API(c, a.simular)
     ren = c.get('token_renovado')
@@ -284,9 +300,10 @@ def main():
     sp.add_parser('verificar'); sp.add_parser('renovar'); sp.add_parser('cola')
     g = sp.add_parser('agregar'); g.add_argument('video'); g.add_argument('fecha', help='"AAAA-MM-DD HH:MM" hora local')
     g.add_argument('--texto'); g.add_argument('--texto-archivo'); g.add_argument('--portada-ms', type=int, default=None, help='ms del video para la portada')
+    pr = sp.add_parser('probar-subida'); pr.add_argument('video')
     e = sp.add_parser('ejecutar'); e.add_argument('--simular', action='store_true'); e.add_argument('--max', type=int, default=1, help='máximo de reels por ejecución')
     a = ap.parse_args()
-    try: {'verificar': cmd_verificar, 'renovar': cmd_renovar, 'agregar': cmd_agregar, 'cola': cmd_cola, 'ejecutar': cmd_ejecutar}[a.cmd](a)
+    try: {'verificar': cmd_verificar, 'renovar': cmd_renovar, 'agregar': cmd_agregar, 'cola': cmd_cola, 'ejecutar': cmd_ejecutar, 'probar-subida': cmd_probar_subida}[a.cmd](a)
     except ErrorAPI as e: log(f'ERROR: {e}'); sys.exit(1)
 
 
