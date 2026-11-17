@@ -94,9 +94,12 @@
     "texto": "Parte 2 ✈️ El capitán Sullenberger eligió el río Hudson… y pasó esto. ¿Acertaste?\nComenta si elegiste bien 👇 y sígueme: mañana, otra decisión.\n#historia #historiasreales #aviacion #milagrodelhudson #sully #nuevayork #quéharíastú #storytime #datoscuriosos #decisiones",
     "publicar_en": "2026-11-17 20:00",
     "portada_ms": 7958,
-    "estado": "error",
+    "estado": "publicado",
     "intentos": 1,
-    "error": "Meta no recibió el video tras 3 envíos: HTTP 400: {\"debug_info\":{\"retriable\":false,\"type\":\"ProcessingFailedError\",\"message\":\"Request processing failed\"}}"
+    "contenedor": "17967705957027444",
+    "media_id": "18135255376783803",
+    "publicado": "2026-11-17 20:24",
+    "permalink": "https://www.instagram.com/reel/Df3Gm5iMSYV/"
   },
   {
     "id": 8,
