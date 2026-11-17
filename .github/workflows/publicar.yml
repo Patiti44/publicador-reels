@@ -16,6 +16,10 @@ on:
         type: choice
         options: [ejecutar, simular, probar-subida]
         default: ejecutar
+      video:
+        description: 'Video para probar-subida (ruta en el repo)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -56,7 +60,7 @@ jobs:
         run: |
           case "${{ inputs.accion }}" in
             simular) python publicar_reel.py ejecutar --simular ;;
-            probar-subida) python publicar_reel.py probar-subida "$(ls videos/*_ig.mp4 | head -1)" ;;
+            probar-subida) V="${{ inputs.video }}"; [ -z "$V" ] && V=$(ls videos/*_ig.mp4 | head -1); python publicar_reel.py probar-subida "$V" ;;
             *) python publicar_reel.py ejecutar ;;
           esac
 
