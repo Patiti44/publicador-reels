@@ -189,8 +189,9 @@ def cmd_cola(a):
 def version_instagram(video: Path) -> Path:
     """Versión liviana para Instagram (720x1280, ~5 MB por minuto). Meta solo completa descargas cortas,
     e Instagram recomprime igual. Queda en publicar/cache/ y se reutiliza."""
-    if video.stem.endswith('_ig'): return video  # ya viene optimizado (p. ej. en la nube)
-    destino = AQUI / 'cache' / (video.stem + '_ig.mp4'); destino.parent.mkdir(exist_ok=True)
+    if video.stem.endswith(('_ig', '_ig720')): return video  # ya viene optimizado (p. ej. en la nube)
+    base = video.stem[:-3] if video.stem.endswith('_hd') else video.stem
+    destino = AQUI / 'cache' / (base + '_ig720.mp4'); destino.parent.mkdir(exist_ok=True)
     if destino.exists() and destino.stat().st_mtime >= video.stat().st_mtime: return destino
     import subprocess
     cmd = ['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-vf', 'scale=720:1280:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow',
@@ -200,6 +201,42 @@ def version_instagram(video: Path) -> Path:
     if r.returncode != 0: raise ErrorAPI(f'ffmpeg no pudo preparar el video: {r.stderr[-300:]}')
     log(f'  versión para Instagram: {destino.name} ({destino.stat().st_size / 1e6:.1f} MB)')
     return destino
+
+
+def version_hd(video: Path) -> Path:
+    """Versión 1080x1920 de buena calidad (~3 MB por cada 10 s) para subir por GitHub Pages."""
+    if video.stem.endswith('_hd'): return video
+    destino = AQUI / 'cache' / (video.stem + '_hd.mp4'); destino.parent.mkdir(exist_ok=True)
+    if destino.exists() and destino.stat().st_mtime >= video.stat().st_mtime: return destino
+    import subprocess
+    cmd = ['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow',
+           '-crf', '19', '-maxrate', '6000k', '-bufsize', '12000k', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '160k', '-ar', '48000',
+           '-movflags', '+faststart', str(destino)]
+    r = subprocess.run(cmd, capture_output=True, text=True, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+    if r.returncode != 0: raise ErrorAPI(f'ffmpeg no pudo preparar el video: {r.stderr[-300:]}')
+    log(f'  versión HD: {destino.name} ({destino.stat().st_size / 1e6:.1f} MB)')
+    return destino
+
+
+def subir_video(api, contenedor, uri, video: Path):
+    """Hace que Meta descargue el video. Modo 'pages': lo sirve unos minutos en GitHub Pages (1080p);
+    si eso falla, cae al túnel con una versión liviana de 720p."""
+    url = uri or f"{api.c['upload_host'].rstrip('/')}/ig-api-upload/{api.c['api_version']}/{contenedor}"
+    if api.c.get('subida') == 'pages':
+        try:
+            from pages import VideoEnPages
+            log(f'  publicando {video.name} ({video.stat().st_size / 1e6:.1f} MB) en GitHub Pages…')
+            with VideoEnPages(video, api.c) as enlace:
+                log('  GitHub Pages listo; Meta descarga el video…')
+                h = {'Authorization': f"OAuth {api.c['access_token']}", 'file_url': enlace}
+                return http('POST', url, headers=h, body=b'', timeout=300)
+        except RuntimeError as e:
+            log(f'  GitHub Pages falló ({e}); se intenta por túnel en 720p')
+            import shutil, subprocess
+            if not shutil.which('ffmpeg') and os.environ.get('GITHUB_ACTIONS'):  # el runner de GitHub no trae ffmpeg
+                subprocess.run('sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg', shell=True, capture_output=True)
+        video = version_instagram(video)
+    return subir_por_tunel(api, contenedor, uri, video)
 
 
 def subir_por_tunel(api, contenedor, uri, video: Path):
@@ -225,13 +262,13 @@ def publicar(api, uid, item):
         p = {'media_type': 'REELS', 'upload_type': 'resumable', 'caption': item['texto'], 'share_to_feed': 'true'}
         if item.get('portada_ms') is not None: p['thumb_offset'] = str(item['portada_ms'])
         modo = api.c.get('subida', 'tunel')
-        fuente = version_instagram(video) if (modo == 'tunel' and not api.sim) else video
+        fuente = video if api.sim else (version_hd(video) if modo == 'pages' else version_instagram(video) if modo == 'tunel' else video)
         ultimo = None
         for intento in range(1, 4):
             rc = api.post(f'{uid}/media', p); cont = rc['id']
             log(f"  contenedor {cont} (envío {intento}/3, modo {modo})")
             try:
-                r = subir_por_tunel(api, cont, rc.get('uri'), fuente) if (modo == 'tunel' and not api.sim) else api.subir(cont, fuente, rc.get('uri'))
+                r = subir_video(api, cont, rc.get('uri'), fuente) if (modo in ('tunel', 'pages') and not api.sim) else api.subir(cont, fuente, rc.get('uri'))
                 if not r.get('success', True): raise ErrorAPI(f'la subida falló: {r}')
                 break
             except (ErrorAPI, RuntimeError) as e:
@@ -286,10 +323,11 @@ def cmd_comentar(a):
 def cmd_probar_subida(a):
     """Crea un contenedor y hace que Meta reciba el video, pero NO publica (el contenedor caduca solo en 24 h)."""
     c = cargar_config(); api = API(c); uid = user_id(api)
-    video = version_instagram(Path(a.video).resolve())
+    modo = c.get('subida', 'tunel'); video = Path(a.video).resolve()
+    video = version_hd(video) if modo == 'pages' else version_instagram(video)
     rc = api.post(f'{uid}/media', {'media_type': 'REELS', 'upload_type': 'resumable'}); cont = rc['id']
     log(f'PRUEBA (no publica): contenedor {cont}, video {video.name}')
-    r = subir_por_tunel(api, cont, rc.get('uri'), video) if c.get('subida', 'tunel') == 'tunel' else api.subir(cont, video, rc.get('uri'))
+    r = subir_video(api, cont, rc.get('uri'), video) if modo in ('tunel', 'pages') else api.subir(cont, video, rc.get('uri'))
     log(f'  respuesta de subida: {r}')
     for _ in range(30):
         st = api.get(cont, {'fields': 'status_code,status'})

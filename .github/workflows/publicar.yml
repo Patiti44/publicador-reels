@@ -53,8 +53,16 @@ jobs:
           import json, os
           json.dump({'access_token': os.environ['IG_TOKEN'], 'ig_user_id': os.environ['IG_USER_ID'], 'api': 'facebook',
                      'graph_host': 'https://graph.facebook.com', 'api_version': 'v23.0', 'upload_host': 'https://rupload.facebook.com',
-                     'subida': 'tunel', 'tuneles': ['serveo', 'localhostrun']}, open('config.json', 'w'))
+                     'subida': 'pages', 'tuneles': ['serveo', 'localhostrun']}, open('config.json', 'w'))
           EOF
+
+      - name: Llave del repo de videos (GitHub Pages)
+        env:
+          VIDEOS_DEPLOY_KEY: ${{ secrets.VIDEOS_DEPLOY_KEY }}
+        run: |
+          printf '%s
+' "$VIDEOS_DEPLOY_KEY" > "$RUNNER_TEMP/videos_key" && chmod 600 "$RUNNER_TEMP/videos_key"
+          echo "VIDEOS_DEPLOY_KEY_FILE=$RUNNER_TEMP/videos_key" >> "$GITHUB_ENV"
 
       - name: Publicar lo que toca
         run: |
