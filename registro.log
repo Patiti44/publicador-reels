@@ -1,0 +1,4 @@
+[2026-11-17 01:30:59] PRUEBA (no publica): contenedor 17967492408027444, video abandonado_selkirk_parte1_ig.mp4
+[2026-11-17 01:31:02]   túnel serveo abierto; Meta descarga el video…
+[2026-11-17 01:31:31]   respuesta de subida: {'success': True, 'message': 'Upload Successful.'}
+[2026-11-17 01:31:32]   PRUEBA estado final: FINISHED - Finished: Media has been uploaded and it is ready to be published.
