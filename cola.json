@@ -51,5 +51,53 @@
     "publicar_en": "2026-11-21 16:00",
     "portada_ms": 11000,
     "estado": "pendiente"
+  },
+  {
+    "id": 7,
+    "video": "videos/208_segundos_vuelo1549_parte2_ig.mp4",
+    "texto": "Parte 2 ✈️ El capitán Sullenberger eligió el río Hudson… y pasó esto. ¿Acertaste?\nComenta si elegiste bien 👇 y sígueme: mañana, otra decisión.\n#historia #historiasreales #aviacion #milagrodelhudson #sully #nuevayork #quéharíastú #storytime #datoscuriosos #decisiones",
+    "publicar_en": "2026-11-17 20:00",
+    "portada_ms": 14980,
+    "estado": "pendiente"
+  },
+  {
+    "id": 8,
+    "video": "videos/dos_bombas_yamaguchi_parte2_ig.mp4",
+    "texto": "Parte 2 🚂 Tsutomu Yamaguchi tomó el tren a Nagasaki. Lo que pasó después parece imposible… pero es real.\n¿Habrías subido? 👇 Sígueme: mañana, otra decisión.\n#historia #historiasreales #segundaguerramundial #hiroshima #nagasaki #japon #quéharíastú #storytime #datoscuriosos #decisiones",
+    "publicar_en": "2026-11-18 20:00",
+    "portada_ms": 5770,
+    "estado": "pendiente"
+  },
+  {
+    "id": 9,
+    "video": "videos/abandonado_selkirk_parte2_ig.mp4",
+    "texto": "Parte 2 🏝️ Alexander Selkirk eligió la isla… y se arrepintió al instante. Su historia terminó convertida en una novela famosa.\n¿Acertaste? 👇 Sígueme: mañana, otra decisión.\n#historia #historiasreales #chile #islarobinsoncrusoe #robinsoncrusoe #juanfernandez #quéharíastú #storytime #datoscuriosos #decisiones",
+    "publicar_en": "2026-11-19 20:00",
+    "portada_ms": 5599,
+    "estado": "pendiente"
+  },
+  {
+    "id": 10,
+    "video": "videos/guerra_29_anos_onoda_parte2_ig.mp4",
+    "texto": "Parte 2 🌴 Hiroo Onoda no le creyó al joven. Solo se rindió cuando apareció su antiguo comandante… que vendía libros.\n¿Le habrías creído? 👇 Sígueme: mañana, otra decisión.\n#historia #historiasreales #segundaguerramundial #onoda #japon #filipinas #quéharíastú #storytime #datoscuriosos #decisiones",
+    "publicar_en": "2026-11-20 20:00",
+    "portada_ms": 6349,
+    "estado": "pendiente"
+  },
+  {
+    "id": 11,
+    "video": "videos/espia_nadie_queria_garbo_parte2_ig.mp4",
+    "texto": "Parte 2 🕵️ Juan Pujol inventó 27 espías que no existían… y terminó engañando a Hitler en el Día D.\n¿Te habrías arriesgado? 👇 Sígueme: mañana, otra decisión.\n#historia #historiasreales #espias #segundaguerramundial #garbo #diad #quéharíastú #storytime #datoscuriosos #decisiones",
+    "publicar_en": "2026-11-21 20:00",
+    "portada_ms": 6258,
+    "estado": "pendiente"
+  },
+  {
+    "id": 12,
+    "video": "videos/muerto_secretos_mincemeat_parte2_ig.mp4",
+    "texto": "Parte 2 🧳 Los alemanes le creyeron al muerto. Era la mayor trampa de la guerra: la Operación Carne Picada.\n¿Le habrías creído? 👇 Sígueme: mañana, otra decisión.\n#historia #historiasreales #espias #segundaguerramundial #operacionmincemeat #huelva #quéharíastú #storytime #datoscuriosos #decisiones",
+    "publicar_en": "2026-11-22 20:00",
+    "portada_ms": 6213,
+    "estado": "pendiente"
   }
 ]
