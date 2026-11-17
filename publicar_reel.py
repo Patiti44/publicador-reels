@@ -190,6 +190,10 @@ def version_instagram(video: Path) -> Path:
     """Versión liviana para Instagram (720x1280, ~5 MB por minuto). Meta solo completa descargas cortas,
     e Instagram recomprime igual. Queda en publicar/cache/ y se reutiliza."""
     if video.stem.endswith(('_ig', '_ig720')): return video  # ya viene optimizado (p. ej. en la nube)
+    import shutil, subprocess
+    if not shutil.which('ffmpeg') and os.environ.get('GITHUB_ACTIONS'):  # el runner de GitHub no trae ffmpeg
+        log('  instalando ffmpeg en el runner…')
+        subprocess.run('sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg', shell=True, capture_output=True)
     base = video.stem[:-3] if video.stem.endswith('_hd') else video.stem
     destino = AQUI / 'cache' / (base + '_ig720.mp4'); destino.parent.mkdir(exist_ok=True)
     if destino.exists() and destino.stat().st_mtime >= video.stat().st_mtime: return destino
@@ -204,23 +208,26 @@ def version_instagram(video: Path) -> Path:
 
 
 def version_hd(video: Path) -> Path:
-    """Versión 1080x1920 de buena calidad (~3 MB por cada 10 s) para subir por GitHub Pages."""
+    """Versión 1080x1920 para subir por GitHub Pages. Meta rechaza (ProcessingFailedError) los archivos grandes:
+    24 MB falló y ~10 MB funciona (pruebas del 17-11-2026), así que se apunta a <= 10,5 MB."""
     if video.stem.endswith('_hd'): return video
     destino = AQUI / 'cache' / (video.stem + '_hd.mp4'); destino.parent.mkdir(exist_ok=True)
     if destino.exists() and destino.stat().st_mtime >= video.stat().st_mtime: return destino
     import subprocess
-    cmd = ['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow',
-           '-crf', '19', '-maxrate', '6000k', '-bufsize', '12000k', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '128k', '-ar', '48000',
-           '-movflags', '+faststart', str(destino)]
-    r = subprocess.run(cmd, capture_output=True, text=True, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
-    if r.returncode != 0: raise ErrorAPI(f'ffmpeg no pudo preparar el video: {r.stderr[-300:]}')
-    log(f'  versión HD: {destino.name} ({destino.stat().st_size / 1e6:.1f} MB)')
+    for crf, maxrate in ((21, 1800), (23, 1500), (25, 1200)):
+        cmd = ['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow',
+               '-profile:v', 'high', '-level:v', '4.0', '-crf', str(crf), '-maxrate', f'{maxrate}k', '-bufsize', f'{2 * maxrate}k',
+               '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '128k', '-ar', '48000', '-ac', '2', '-movflags', '+faststart', str(destino)]
+        r = subprocess.run(cmd, capture_output=True, text=True, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+        if r.returncode != 0: raise ErrorAPI(f'ffmpeg no pudo preparar el video: {r.stderr[-300:]}')
+        if destino.stat().st_size <= 10.5e6: break
+    log(f'  versión HD: {destino.name} ({destino.stat().st_size / 1e6:.1f} MB, crf {crf})')
     return destino
 
 
 def subir_video(api, contenedor, uri, video: Path):
-    """Hace que Meta descargue el video. Modo 'pages': lo sirve unos minutos en GitHub Pages (1080p);
-    si eso falla, cae al túnel con una versión liviana de 720p."""
+    """Hace que Meta descargue el video. Modo 'pages': lo sirve unos minutos en GitHub Pages;
+    si Pages no llega a publicarlo, cae al túnel con la versión liviana de 720p."""
     url = uri or f"{api.c['upload_host'].rstrip('/')}/ig-api-upload/{api.c['api_version']}/{contenedor}"
     if api.c.get('subida') == 'pages':
         try:
@@ -232,9 +239,6 @@ def subir_video(api, contenedor, uri, video: Path):
                 return http('POST', url, headers=h, body=b'', timeout=300)
         except RuntimeError as e:
             log(f'  GitHub Pages falló ({e}); se intenta por túnel en 720p')
-            import shutil, subprocess
-            if not shutil.which('ffmpeg') and os.environ.get('GITHUB_ACTIONS'):  # el runner de GitHub no trae ffmpeg
-                subprocess.run('sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg', shell=True, capture_output=True)
         video = version_instagram(video)
     return subir_por_tunel(api, contenedor, uri, video)
 
@@ -263,8 +267,11 @@ def publicar(api, uid, item):
         if item.get('portada_ms') is not None: p['thumb_offset'] = str(item['portada_ms'])
         modo = api.c.get('subida', 'tunel')
         fuente = video if api.sim else (version_hd(video) if modo == 'pages' else version_instagram(video) if modo == 'tunel' else video)
+        liviana = None
         ultimo = None
         for intento in range(1, 4):
+            if intento == 3 and modo == 'pages' and not api.sim:  # último envío: versión liviana de 720p, que Meta siempre acepta
+                fuente = liviana = liviana or version_instagram(video)
             rc = api.post(f'{uid}/media', p); cont = rc['id']
             log(f"  contenedor {cont} (envío {intento}/3, modo {modo})")
             try:
