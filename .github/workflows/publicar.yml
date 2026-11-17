@@ -1,0 +1,64 @@
+name: Publicar reels
+
+# Publica en Instagram los reels de cola.json cuya hora (America/Santiago) ya llegó.
+# Corre en GitHub, así que el PC puede estar apagado.
+# - cada hora al minuto 3
+# - cada 10 minutos entre las 19:00 y las 20:59 UTC (16:00-17:59 en Chile en verano, 15:00-16:59 en invierno)
+on:
+  schedule:
+    - cron: '3 * * * *'
+    - cron: '*/10 19,20 * * *'
+  workflow_dispatch:
+    inputs:
+      simular:
+        description: 'Solo simular (no publica)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-reels
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: America/Santiago
+      PUBLICAR_DATOS: ${{ github.workspace }}
+      PUBLICAR_RAIZ: ${{ github.workspace }}
+      PYTHONIOENCODING: utf-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Crear config.json desde el secreto
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: |
+          python - <<'EOF'
+          import json, os
+          json.dump({'access_token': os.environ['IG_TOKEN'], 'ig_user_id': os.environ['IG_USER_ID'], 'api': 'facebook',
+                     'graph_host': 'https://graph.facebook.com', 'api_version': 'v23.0', 'upload_host': 'https://rupload.facebook.com',
+                     'subida': 'tunel', 'tuneles': ['serveo', 'localhostrun']}, open('config.json', 'w'))
+          EOF
+
+      - name: Publicar lo que toca
+        run: |
+          if [ "${{ inputs.simular }}" = "true" ]; then python publicar_reel.py ejecutar --simular; else python publicar_reel.py ejecutar; fi
+
+      - name: Guardar el estado de la cola
+        if: always()
+        run: |
+          rm -f config.json
+          git config user.name "publicador-reels"
+          git config user.email "publicador-reels@users.noreply.github.com"
+          git add cola.json registro.log 2>/dev/null || true
+          if ! git diff --cached --quiet; then git commit -m "Estado de la cola: $(date '+%Y-%m-%d %H:%M')" && git push; fi
