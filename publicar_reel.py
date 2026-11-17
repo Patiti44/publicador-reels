@@ -209,18 +209,18 @@ def version_instagram(video: Path) -> Path:
 
 def version_hd(video: Path) -> Path:
     """Versión 1080x1920 para subir por GitHub Pages. Meta rechaza (ProcessingFailedError) los archivos grandes:
-    24 MB falló y ~10 MB funciona (pruebas del 17-11-2026), así que se apunta a <= 10,5 MB."""
+    24 MB siempre falla y ~10 MB a veces (pruebas del 17-11-2026), así que se apunta a <= 8 MB."""
     if video.stem.endswith('_hd'): return video
     destino = AQUI / 'cache' / (video.stem + '_hd.mp4'); destino.parent.mkdir(exist_ok=True)
     if destino.exists() and destino.stat().st_mtime >= video.stat().st_mtime: return destino
     import subprocess
-    for crf, maxrate in ((21, 1800), (23, 1500), (25, 1200)):
+    for crf, maxrate in ((22, 1400), (24, 1150), (26, 950)):
         cmd = ['ffmpeg', '-v', 'error', '-y', '-i', str(video), '-vf', 'scale=1080:1920:flags=lanczos', '-c:v', 'libx264', '-preset', 'slow',
                '-profile:v', 'high', '-level:v', '4.0', '-crf', str(crf), '-maxrate', f'{maxrate}k', '-bufsize', f'{2 * maxrate}k',
                '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '128k', '-ar', '48000', '-ac', '2', '-movflags', '+faststart', str(destino)]
         r = subprocess.run(cmd, capture_output=True, text=True, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         if r.returncode != 0: raise ErrorAPI(f'ffmpeg no pudo preparar el video: {r.stderr[-300:]}')
-        if destino.stat().st_size <= 10.5e6: break
+        if destino.stat().st_size <= 8.0e6: break
     log(f'  versión HD: {destino.name} ({destino.stat().st_size / 1e6:.1f} MB, crf {crf})')
     return destino
 
