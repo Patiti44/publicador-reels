@@ -167,12 +167,19 @@
     "texto": "El tata llama… 📞\nMismo nieto. Mismas llamadas. Dos decisiones.\nUno siempre tuvo un \"después\". El otro, un \"¡hola, tata!\".\n¿Cuál de los dos eres tú? Comenta A o B 👇\n\n#abuelos #familia #tata #reflexion #llamaatusabuelos #tiempo #amor #reels",
     "publicar_en": "2026-11-18 12:30",
     "portada_ms": 1500,
-    "estado": "error",
+    "estado": "publicado",
     "comentarios": [
       "🅰️ Equipo A: el que siempre lo deja para después. Dale ❤️ si te ha pasado",
       "🅱️ Equipo B: el que contesta siempre. Dale ❤️ si eres este"
     ],
     "intentos": 3,
-    "error": "Meta no recibió el video tras 3 envíos: HTTP 400: {\"debug_info\":{\"retriable\":false,\"type\":\"ProcessingFailedError\",\"message\":\"Request processing failed\"}}"
+    "contenedor": "17967864633027444",
+    "media_id": "17917564770516469",
+    "publicado": "2026-11-18 13:24",
+    "permalink": "https://www.instagram.com/reel/Df47YWaS__e/",
+    "comentarios_ids": [
+      "18093741350231651",
+      "17958158580301976"
+    ]
   }
 ]
