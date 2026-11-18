@@ -172,7 +172,7 @@
       "🅰️ Equipo A: el que siempre lo deja para después. Dale ❤️ si te ha pasado",
       "🅱️ Equipo B: el que contesta siempre. Dale ❤️ si eres este"
     ],
-    "intentos": 2,
+    "intentos": 3,
     "error": "Meta no recibió el video tras 3 envíos: HTTP 400: {\"debug_info\":{\"retriable\":false,\"type\":\"ProcessingFailedError\",\"message\":\"Request processing failed\"}}"
   }
 ]
