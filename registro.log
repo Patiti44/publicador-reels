@@ -237,3 +237,20 @@
 [2026-11-20 00:55:24] Nada que publicar.
 [2026-11-20 01:38:45] Nada que publicar.
 [2026-11-20 08:23:41] Nada que publicar.
+[2026-11-20 12:37:38] Publicando #16 (ahora_no_hd.mp4) programado para 2026-11-20 12:30
+[2026-11-20 12:37:39]   contenedor 17968262196027444 (envío 1/3, modo pages)
+[2026-11-20 12:37:41]   túnel serveo abierto; Meta descarga el video…
+[2026-11-20 12:37:54]   el envío 1 falló: HTTP 500: {"debug_info":{"retriable":false,"type":"InternalServerError","message":"proxygen::coro::HTTPError: HTTP source aborted err=INTERNAL_ERROR, details=received RST_STREAM from peer"}}
+[2026-11-20 12:38:00]   contenedor 17968262373027444 (envío 2/3, modo pages)
+[2026-11-20 12:38:00]   publicando ahora_no_hd.mp4 (10.4 MB) en GitHub Pages…
+[2026-11-20 12:38:36]   GitHub Pages listo; Meta descarga el video…
+[2026-11-20 12:39:09]   el envío 2 falló: HTTP 400: {"debug_info":{"retriable":false,"type":"ProcessingFailedError","message":"Request processing failed"}}
+[2026-11-20 12:39:14]   instalando ffmpeg en el runner…
+[2026-11-20 12:40:46]   versión para Instagram: ahora_no_ig720.mp4 (3.4 MB)
+[2026-11-20 12:40:47]   contenedor 17968263291027444 (envío 3/3, modo pages)
+[2026-11-20 12:40:50]   túnel serveo abierto; Meta descarga el video…
+[2026-11-20 12:41:15]   video recibido por Meta, esperando a que Instagram lo procese…
+[2026-11-20 12:41:27]   PUBLICADO #16 https://www.instagram.com/reel/Df-AA4YBq-L/
+[2026-11-20 12:41:27] Comentando #16 https://www.instagram.com/reel/Df-AA4YBq-L/
+[2026-11-20 12:41:29]   comentario 18378647167246153: 🅰️ Equipo A: mi papá siempre estaba "ocupado". Dale ❤️ si te pasó
+[2026-11-20 12:41:34]   comentario 18123902644987585: 🅱️ Equipo B: mi papá siempre tenía 5 minutos para jugar. Dale ❤️ si tuviste ese papá
