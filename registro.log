@@ -326,3 +326,20 @@
 [2026-11-22 00:47:00] Nada que publicar.
 [2026-11-22 03:31:51] Nada que publicar.
 [2026-11-22 12:13:09] Nada que publicar.
+[2026-11-22 12:37:58] Publicando #18 (como_tu_hermano_hd.mp4) programado para 2026-11-22 12:30
+[2026-11-22 12:37:59]   contenedor 17968698816027444 (envío 1/3, modo pages)
+[2026-11-22 12:38:01]   túnel serveo abierto; Meta descarga el video…
+[2026-11-22 12:38:42]   el envío 1 falló: HTTP 400: {"debug_info":{"retriable":false,"type":"ProcessingFailedError","message":"Request processing failed"}}
+[2026-11-22 12:38:48]   contenedor 17968698843027444 (envío 2/3, modo pages)
+[2026-11-22 12:38:48]   publicando como_tu_hermano_hd.mp4 (6.5 MB) en GitHub Pages…
+[2026-11-22 12:39:14]   GitHub Pages listo; Meta descarga el video…
+[2026-11-22 12:39:47]   el envío 2 falló: HTTP 400: {"debug_info":{"retriable":false,"type":"ProcessingFailedError","message":"Request processing failed"}}
+[2026-11-22 12:39:52]   instalando ffmpeg en el runner…
+[2026-11-22 12:40:35]   versión para Instagram: como_tu_hermano_ig720.mp4 (3.6 MB)
+[2026-11-22 12:40:36]   contenedor 17968699221027444 (envío 3/3, modo pages)
+[2026-11-22 12:40:38]   túnel serveo abierto; Meta descarga el video…
+[2026-11-22 12:41:05]   video recibido por Meta, esperando a que Instagram lo procese…
+[2026-11-22 12:41:14]   PUBLICADO #18 https://www.instagram.com/reel/DgDJlMlM1L4/
+[2026-11-22 12:41:14] Comentando #18 https://www.instagram.com/reel/DgDJlMlM1L4/
+[2026-11-22 12:41:17]   comentario 18165487831501015: 🅰️ Equipo A: a mí siempre me compararon. Dale ❤️ si te pasó
+[2026-11-22 12:41:24]   comentario 17962135533014474: 🅱️ Equipo B: a mí me dijeron "estoy orgulloso de ti". Dale ❤️ si tuviste ese papá
