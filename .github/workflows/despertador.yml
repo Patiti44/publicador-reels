@@ -38,6 +38,8 @@ jobs:
       GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main   # la cola de ahora, no la de hace 15 min cuando se lanzó la corrida
 
       - name: ¿Toca publicar algo?
         id: cola
