@@ -1,0 +1,74 @@
+name: Despertador
+
+# Latido cada ~15 min para que los reels salgan a su hora aunque el cron de GitHub se salte corridas
+# y el PC esté apagado. La espera la hace el entorno "espera" (temporizador de 15 min, sin ocupar
+# máquina); después un paso corto revisa la cola, lanza "Publicar reels" si algo ya tocaba y
+# se vuelve a lanzar a sí mismo. Si la cadena se corta, el cron o un push a cola.json la reinician.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [cola.json]
+  schedule:
+    - cron: '41 */3 * * *'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: despertador
+  cancel-in-progress: false
+
+jobs:
+  esperar:
+    runs-on: ubuntu-latest
+    environment: espera
+    timeout-minutes: 2
+    steps:
+      - run: echo "15 minutos esperados"
+
+  revisar:
+    needs: esperar
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TZ: America/Santiago
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ¿Toca publicar algo?
+        id: cola
+        run: |
+          python3 - <<'EOF' >> "$GITHUB_OUTPUT"
+          import json, datetime as dt
+          FMT = '%Y-%m-%d %H:%M'
+          cola = json.load(open('cola.json', encoding='utf-8'))
+          ahora = dt.datetime.now()
+          toca = [x for x in cola if x['estado'] in ('pendiente', 'subiendo', 'error')
+                  and dt.datetime.strptime(x['publicar_en'], FMT) <= ahora and x.get('intentos', 0) < 5]
+          comentar = [x for x in cola if x['estado'] == 'publicado' and x.get('media_id')
+                      and len(x.get('comentarios_ids', [])) < len(x.get('comentarios', []))
+                      and x.get('comentar_intentos', 0) < 5]
+          print(f"toca={'si' if toca or comentar else 'no'}")
+          print(f"ids={','.join(str(x['id']) for x in toca + comentar)}")
+          EOF
+          cat "$GITHUB_OUTPUT"
+
+      - name: Lanzar Publicar reels
+        if: steps.cola.outputs.toca == 'si'
+        run: |
+          activos=$(gh run list --workflow publicar.yml --limit 10 --json status \
+                    --jq '[.[] | select(.status != "completed")] | length')
+          if [ "$activos" = "0" ]; then
+            echo "Toca #${{ steps.cola.outputs.ids }}: lanzando Publicar reels"
+            gh workflow run publicar.yml -f accion=ejecutar
+          else
+            echo "Publicar reels ya está corriendo ($activos)"
+          fi
+
+      - name: Seguir el latido
+        if: always()
+        run: gh workflow run despertador.yml
