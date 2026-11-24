@@ -78,4 +78,7 @@ jobs:
           git config user.name "publicador-reels"
           git config user.email "publicador-reels@users.noreply.github.com"
           git add cola.json registro.log 2>/dev/null || true
-          if ! git diff --cached --quiet; then git commit -m "Estado de la cola: $(date '+%Y-%m-%d %H:%M')" && git push; fi
+          if ! git diff --cached --quiet; then
+            git commit -m "Estado de la cola: $(date '+%Y-%m-%d %H:%M')"
+            for i in 1 2 3; do git pull --rebase -X theirs && git push && break; sleep 5; done
+          fi
