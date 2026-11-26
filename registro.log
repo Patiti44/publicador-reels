@@ -387,3 +387,20 @@
 [2026-11-26 02:28:23] Nada que publicar.
 [2026-11-26 02:43:09] Nada que publicar.
 [2026-11-26 06:23:05] Nada que publicar.
+[2026-11-26 12:32:29] Publicando #22 (a_que_hora_llegas_hd.mp4) programado para 2026-11-26 12:30
+[2026-11-26 12:32:30]   contenedor 17969485272027444 (envío 1/3, modo pages)
+[2026-11-26 12:32:33]   túnel serveo abierto; Meta descarga el video…
+[2026-11-26 12:33:14]   el envío 1 falló: HTTP 400: {"debug_info":{"retriable":false,"type":"ProcessingFailedError","message":"Request processing failed"}}
+[2026-11-26 12:33:19]   contenedor 17969485353027444 (envío 2/3, modo pages)
+[2026-11-26 12:33:19]   publicando a_que_hora_llegas_hd.mp4 (6.4 MB) en GitHub Pages…
+[2026-11-26 12:33:54]   GitHub Pages listo; Meta descarga el video…
+[2026-11-26 12:34:28]   el envío 2 falló: HTTP 400: {"debug_info":{"retriable":false,"type":"ProcessingFailedError","message":"Request processing failed"}}
+[2026-11-26 12:34:33]   instalando ffmpeg en el runner…
+[2026-11-26 12:35:12]   versión para Instagram: a_que_hora_llegas_ig720.mp4 (3.6 MB)
+[2026-11-26 12:35:12]   contenedor 17969486016027444 (envío 3/3, modo pages)
+[2026-11-26 12:35:15]   túnel serveo abierto; Meta descarga el video…
+[2026-11-26 12:35:43]   video recibido por Meta, esperando a que Instagram lo procese…
+[2026-11-26 12:35:53]   PUBLICADO #22 https://www.instagram.com/reel/DgNcJO4hfVq/
+[2026-11-26 12:35:53] Comentando #22 https://www.instagram.com/reel/DgNcJO4hfVq/
+[2026-11-26 12:35:55]   comentario 18485962735117184: 🅰️ Equipo A: a mí me castigaban por llegar tarde. Dale ❤️ si te pasó
+[2026-11-26 12:36:00]   comentario 17993949831057969: 🅱️ Equipo B: mi papá me decía “avísame y te busco”. Dale ❤️ si tuviste ese papá
